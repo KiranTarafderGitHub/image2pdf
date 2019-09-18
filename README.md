@@ -1,7 +1,5 @@
 # image2pdf
 
-![Image of Sample PDF](https://github.com/KiranTarafderGitHub/image2pdf/blob/master/myPDF-2019-09-18(5)-1.jpg)
-
 This is a Spring Boot Application to convert image(s) to PDF. 
 
 This application uses itextpdf's html2pdf library for converting html pages to PDF.
@@ -33,7 +31,15 @@ This application uses itextpdf's html2pdf library for converting html pages to P
 6. Select and Upload the images
 7. Click Download to download the PDF File.
 
------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------------
+
+# Sample Output
+
+Below is an image of sample PDF when 6(3Row X 2Col) Template is selected.
+
+![Image of Sample PDF](https://github.com/KiranTarafderGitHub/image2pdf/blob/master/myPDF-2019-09-18(5)-1.jpg)
+
+---------------------------------------------------------------------------------------------------------------------------------
 
 # ABOUT AUTHOR
 Kiran Tarafder,
