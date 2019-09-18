@@ -1,9 +1,0 @@
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/controller/BaseController.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/Image2pdfApplication.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/model/ImageConfig.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/utils/templates/config/TemplateConfig.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/utils/templates/pagesize/PageSize.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/model/Test.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/service/PdfService.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/config/WebMvcConfig.java
-/home/kiran/workspace/image2pdf/src/main/java/com/kiran/image2pdf/controller/HomeController.java
