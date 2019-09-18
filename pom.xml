@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.8.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.kiran</groupId>
+	<artifactId>image2pdf</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>image2pdf</name>
+	<description>Demo project for Spring Boot</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<itext.version>RELEASE</itext.version>
+	</properties>
+	
+	<!-- All add-ons and iText 7 core-->
+	<repositories>
+	  <repository>
+	    <id>itext</id>
+	    <name>iText Repository - releases</name>
+	    <url>https://repo.itextsupport.com/releases</url>
+	  </repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+		    <groupId>nz.net.ultraq.thymeleaf</groupId>
+		    <artifactId>thymeleaf-layout-dialect</artifactId>
+		</dependency>
+		<dependency>
+			    <groupId>com.itextpdf</groupId>
+			    <artifactId>html2pdf</artifactId>
+			    <version>1.0.4</version>
+			</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+			        <executable>true</executable>
+			    </configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Home</title>
+    <style>
+    	.trClass {
+    		padding: 5px;
+    	}
+    	.form-row {
+    		padding: 5px;
+    		margin:2px;
+    	}
+    	.form-label {
+    		font-size: 16px;
+    		padding-top:5px;
+    	}
+    	
+    	
+    </style>
+    <script th:src="@{/bower_components/jsPDF/dist/jspdf.min.js}"></script>
+    <script th:inline="javascript">
+	    var imageCount =/*[[${imageCount}]]*/ '';
+	    var row =/*[[${row}]]*/ '';
+	    var col =/*[[${col}]]*/ '';
+	    var orientation =/*[[${orientation}]]*/ '';
+	    var images = /*[[${images}]]*/ '';
+	    
+	    
+	    console.log(images);
+	    
+	    $(document).ready(function(){
+	    	$('#templateName').text(name);
+	    	$('#imgcount').val(imageCount);
+	    	
+	    	var pageHeight = 210;
+	    	var imageRowCount=0;
+	    	var imageColCount=0;
+	    	var imageHeight = 0;
+	    	
+	    	if(imageCount == 1)
+    		{
+	    		imageRowCount = 1;imageColCount=1;imageHeight = (pageHeight/imageRowCount);imageHeight=imageHeight+"mm";
+    		}
+	    	else if(imageCount == 2)
+	    	{
+	    		imageRowCount = 1;imageColCount=2;imageHeight = (pageHeight/imageRowCount);imageHeight=imageHeight+"mm";
+	    	}
+	    	else if(imageCount == 4)
+	    	{
+	    		imageRowCount = 2;imageColCount=2;imageHeight = (pageHeight/imageRowCount);imageHeight=imageHeight+"mm";
+	    	}
+	    	else if(imageCount == 6)
+	    	{
+	    		imageRowCount = 2;imageColCount=3;imageHeight = (pageHeight/imageRowCount);imageHeight=imageHeight+"mm";
+	    	}
+	    	
+	    	var pageBuilderString = "";
+	    	/* 
+	    	<div class="col-md-12 imageMainContainer" >
+								<div class="row imageRow">
+									<div class="col-md-6 imageContainer">
+										<div class="col-md-12" id="image1Div">
+											<img id="image1" src="#" />
+										</div>
+									</div>
+									<div class="col-md-6 imageContainer">
+										<div class="col-md-12" style="background-image: url("/images/fileName1.png");height: 100%;width: 100%;background-size: contain;background-repeat: no-repeat;">
+										</div>
+									</div>
+								</div>
+							</div>*/
+	    	var imageIndex = 0;
+	    	var indexRow = 1;
+			var imageRowString = "";
+	    	for(indexRow=1;indexRow <= imageRowCount;indexRow++)	
+	    	{
+	    		var indexCol = 1;
+	    		var imageColString = "";
+	    		for(indexCol = 1;indexCol <= imageColCount;indexCol++)
+	    		{
+	    			var url = '/images/'+images[imageIndex];
+	    			imageColString = imageColString+ '<div class="col-md-6 imageContainer"><div class="col-md-12" style="background-image: url('+url+');height: 100%;width: 100%;background-size: 100% 100%;background-repeat: no-repeat;"></div></div>';
+	    			imageIndex++;
+	    		}
+	    		imageRowString = imageRowString + '<div class="row imageRow">'+imageColString+'</div>';
+	    		
+	    	}
+	    	pageBuilderString = pageBuilderString + imageRowString;
+			
+	    	$('#imageMainContainer').html(pageBuilderString);
+	    	$('#imageMainContainer').css("height","210mm");
+	    	$('.imageRow').css("height",imageHeight);
+	    	$('.imageContainer').css("height","100%");
+	    	
+	    		 
+		});//ready closed
+    </script>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Preview
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/home"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      
+      <!-- Main row -->
+      <div class="row">
+        <section class="col-lg-12 ">
+   			<div class="row form-row">
+				<page size="A4" id="page">
+					<div class="row">
+						<div class="col-md-12 imageMainContainer" id="imageMainContainer">
+							
+						</div>
+					</div>
+				</page>
+			</div>
+        </section>
+        
+      </div>
+    </section>
+    <!-- /.content -->
+</div>
+
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script th:src="@{/dist/js/pages/dashboard.js}"></script>
+</body>
+</html>
