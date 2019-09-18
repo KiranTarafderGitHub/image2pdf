@@ -7,8 +7,8 @@ This application uses itextpdf's html2pdf library for converting html pages to P
 
 # Requirements to build the project:
 
-1. java jdk 1.8 or higher
-2. eclipse ide + spring tool suite
+1. Java jdk 1.8 or higher
+2. Eclipse ide + spring tool suite
 3. Spring Booot 2.1.8 or higher
 
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ This application uses itextpdf's html2pdf library for converting html pages to P
 -----------------------------------------------------------------------------------------------------------------------------------
 
 # UI User Flow
-1. open the application in browser
+1. Open the application in browser
 2. Click create button
 3. Select page size
 4. Select Template from dropdown list
@@ -34,5 +34,5 @@ This application uses itextpdf's html2pdf library for converting html pages to P
 -----------------------------------------------------------------------------------------------------------------------------------
 
 # ABOUT AUTHOR
-Kiran Tarafder 
+Kiran Tarafder,
 West Bengal, India
