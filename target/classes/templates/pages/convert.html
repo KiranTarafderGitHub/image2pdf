@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Home</title>
+    <style>
+    	.trClass {
+    		padding: 5px;
+    	}
+    	.form-row {
+    		padding: 5px;
+    		margin:2px;
+    	}
+    	.form-label {
+    		font-size: 16px;
+    		padding-top:5px;
+    	}
+    </style>
+    <script th:inline="javascript">
+	    var name =/*[[${name}]]*/ '';
+	    var imageCount =/*[[${imageCount}]]*/ '';
+	    var row =/*[[${row}]]*/ '';
+	    var col =/*[[${col}]]*/ '';
+	    var orientation =/*[[${orientation}]]*/ '';
+	    
+	    $(document).ready(function(){
+	    	$('#templateName').text(name);
+	    	$('#imgcount').val(imageCount);
+	    	$('#row').val(row);
+	    	$('#col').val(col);
+	    	$('#orientation').val(orientation);
+	    	
+			var selectImageString = "";
+
+	    	for(i=0;i<parseInt(imageCount);i++)
+    		{
+	    		var id= i+1;
+	    		selectImageString += '<div class="row form-row"><div class="col-md-2"><label>Image '+id+'</label></div><div class="col-md-8"><input type="file" name="uploadImgs" accept=".png, .jpg, .jpeg" id="img'+id+'"></div></div>';
+    		}
+	    	
+	    	$('#uploadDiv').html(selectImageString);
+		});
+    </script>
+</head>
+<body>
+<div layout:fragment="content" th:remove="tag">
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Dashboard
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="/home"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">Dashboard</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      
+      <!-- /.row -->
+      <!-- Main row -->
+      <div class="row">
+        <!-- Left col -->
+        <section class="col-lg-12 ">
+        	<div class="row form-row">
+		 		<div class="col-md-2">
+			 		<label>Tempalte Name: </label>
+		 		</div>
+		 		<div class="col-md-8">	
+		 			<label id="templateName"></label>
+		  		</div>
+		 	</div>
+			<form action="generate" method="POST" enctype="multipart/form-data">
+				<div class="row form-row">
+					<div class="col-md-12">
+				 		<input type="hidden" id="imgcount" name="imgcount">
+				 		<input type="hidden" id="row" name="row">
+				 		<input type="hidden" id="col" name="col">
+				 		<input type="hidden" id="orientation" name="orientation">
+						<div id="uploadDiv">
+							
+						</div>
+			 		</div>
+					
+				</div>
+				<div class="row form-row">
+					<div class="col-md-6">
+				 		<button type="submit">Generate</button>
+			 		</div>
+			 		<div class="col-md-6">	 
+				 		<button type="button">Preview</button>
+			  		</div>
+				</div>
+				
+			</form>		
+        </section>
+        <!-- /.Left col -->
+        
+      </div>
+      <!-- /.row (main row) -->
+
+    </section>
+    <!-- /.content -->
+    
+</div>
+
+<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+<script th:src="@{/dist/js/pages/dashboard.js}"></script>
+</body>
+</html>
