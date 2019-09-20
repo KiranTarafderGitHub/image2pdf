@@ -1,6 +1,6 @@
 # image2pdf
 
-This is a Spring Boot Application to convert image(s) to PDF. 
+This is a Spring Boot Application that converts image(s) into PDF. 
 
 This application uses itextpdf's html2pdf library for converting html pages to PDF.
 
