@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pagesize-config>
+	<sizes>	
+		<!--<size id="1" name="A2" x-lenght="420" y-lenght="594"/> -->
+		<size id="2" name="A3" x-lenght="297" y-lenght="420"/>
+		<size id="3" name="A4" x-lenght="210" y-lenght="297"/>
+		<size id="4" name="A5" x-lenght="148" y-lenght="210"/>
+	</sizes>
+</pagesize-config>

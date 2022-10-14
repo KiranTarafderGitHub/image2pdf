@@ -16,6 +16,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -47,19 +48,20 @@ import com.kiran.image2pdf.utils.templates.pagesize.PageSize.Sizes;
 public class HomeController extends BaseController {
 
 	@Autowired
-	private Environment env;
-
-	@Autowired
 	PdfService pdfService;
 
-	private static List<Template> templateList;
-	private static List<Size> sizeList;
+	@Value("${config.template.path}")
+	private String templateConfigLoaction;
+
+	@Value("${config.page.path}")
+	private String sizeConfigLocation;
+
+	static List<Template> templateList;
+	
+	static List<Size> sizeList;
 
 	@PostConstruct
 	public void initTemplate() {
-
-		String templateConfigLoaction = env.getProperty("TemplateConfigFileLocation");
-		String sizeConfigLocation = env.getProperty("PageSizeConfigFileLocation");
 
 		try {
 
@@ -80,7 +82,7 @@ public class HomeController extends BaseController {
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
@@ -139,14 +141,12 @@ public class HomeController extends BaseController {
 				index++;
 			}
 			imageConfig.setImageList(imageList);
-			
+
 			TimeZone tz = TimeZone.getTimeZone("Asia/Kolkata");
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); 
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 			df.setTimeZone(tz);
 			String nowDate = df.format(new Date());
 
-			
-			
 			String DEST = "images-to-pdf.pdf";
 
 			try {
@@ -165,8 +165,7 @@ public class HomeController extends BaseController {
 
 			InputStreamResource resource = new InputStreamResource(new FileInputStream(fileToDownload));
 
-			return ResponseEntity.ok()
-					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=myPDF-" + nowDate )
+			return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=myPDF-" + nowDate)
 					.contentType(MediaType.APPLICATION_PDF).contentLength(fileToDownload.length()).body(resource);
 
 		} catch (Exception e) {
@@ -247,7 +246,7 @@ public class HomeController extends BaseController {
 		html = "<html>" + head + body + "</html>";
 
 		ConverterProperties properties = new ConverterProperties();
-		//properties.setBaseUri(baseUri);
+		// properties.setBaseUri(baseUri);
 		PdfWriter writer = new PdfWriter(dest);
 		PdfDocument pdf = new PdfDocument(writer);
 

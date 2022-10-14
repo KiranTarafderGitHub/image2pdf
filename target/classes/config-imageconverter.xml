@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template-config>
+	<templates>		
+		<template id="1" template-name="Single Image" image-count="1" row="1" col="1" orientation="v"/>
+		<template id="2" template-name="2 Image Vertical" image-count="2" row="1" col="2" orientation="v"/>
+		<template id="3" template-name="2 Image Horizontal" image-count="2" row="2" col="1" orientation="h"/>
+		<template id="4" template-name="4 Image Vertical" image-count="4" row="2" col="2" orientation="v"/>
+		<template id="5" template-name="6 (2Row X 3Col) Image " image-count="6" row="2" col="3" orientation="v"/>
+		<template id="6" template-name="6 (3Row X 2Col) Image " image-count="6" row="3" col="2" orientation="v"/>
+		<template id="7" template-name="8 (2Row X 4Col) Image " image-count="8" row="2" col="4" orientation="v"/>
+		<template id="8" template-name="8 (4Row X 2Col) Image " image-count="8" row="4" col="2" orientation="v"/>
+	</templates>
+</template-config>
