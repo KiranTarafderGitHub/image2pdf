@@ -153,17 +153,23 @@ public class HomeController extends BaseController {
 				int currentPageImageEndIndex = i * (templateImageCount - 1) + (templateImageCount - 1);
 
 				String[] imageList = new String[templateImageCount];
+				String[] imageTitleList = new String[templateImageCount];
+				
 				int currentPageImageListIndex = 0;
 				for (int j = currentPageImageStartIndex; j <= currentPageImageEndIndex; j++) {
 					
 					if( j < downloadBean.getUploadImgs().length)
+					{
 						imageList[currentPageImageListIndex] = Base64.encodeBase64String(downloadBean.getUploadImgs()[j].getBytes());
+						imageTitleList[currentPageImageListIndex] = downloadBean.getImageTitles()[j];
+					}
 					currentPageImageListIndex++;
 				}
 
 				ImageConfig imageConfig = new ImageConfig();
 				imageConfig.setImageList(imageList);
-
+				imageConfig.setImageTitles(imageTitleList);
+				
 				for (Template tmpl : templateList) {
 					if (String.valueOf(tmpl.getId()).equals(downloadBean.getTemplateId())) {
 						imageConfig.setTemplate(tmpl);
@@ -283,8 +289,11 @@ public class HomeController extends BaseController {
 	public void createPdf(String dest, ImageConfig imageConfig,  String title) throws IOException {
 
 		String[] imageList = imageConfig.getImageList();
+		String[] imageTitleList = imageConfig.getImageTitles();
+		
 		int imageCount = imageList.length;
 		String titleDivHeightInMM = "7";
+		String titleImageDivHeightInMM = "5";
 		
 		String rowCount = imageConfig.getTemplate().getRow();
 		String colCount = imageConfig.getTemplate().getCol();
@@ -313,9 +322,14 @@ public class HomeController extends BaseController {
 
 		float imageContainerHeightInMMFloat = (Float.parseFloat(rowHeightInPercent) * (95.0F / 100.0F))
 				* Float.parseFloat(containerHeightInMM) / 100.0F;
-
 		String imageContainerHeightInMM = String.valueOf((int) imageContainerHeightInMMFloat);
-
+		
+		float imageHeightInMMFloat = imageContainerHeightInMMFloat;
+		String imageHeightInMM = String.valueOf((int) imageHeightInMMFloat);
+		
+		float imageWithTitleHeightInMMFloat = imageContainerHeightInMMFloat - Float.parseFloat(titleImageDivHeightInMM);
+		String imageWithTitleHeightInMM = String.valueOf((int) imageWithTitleHeightInMMFloat);
+		
 		String html = "";
 		String head = "";
 		String body = "";
@@ -327,8 +341,10 @@ public class HomeController extends BaseController {
 				+ "%;width:" + rowWidthInPercent + "%;padding:1px 3px 1px 3px;}" + ".column {float: left;width: "
 				+ colWidthInPercent + "%;padding: 5px;height: " + colheightInPercent + "%;}"
 				+ ".imageContainer {height:" + imageContainerHeightInMM + "mm;}"
-				+ ".imageContainer img{ width: 100%;height: " + imageContainerHeightInMM + "mm;margin: auto;object-fit: contain;display:block;}"
+				+ ".image { width: 100%;height: " + imageHeightInMM + "mm;margin: auto;object-fit: contain;display:block;}"
+				+ ".imageWithTitle { width: 100%;height: " + imageWithTitleHeightInMM + "mm;margin: auto;object-fit: contain;display:block;}"
 				+ ".page-title {height:" + titleDivHeightInMM + "mm;text-align: center;padding-top:3px;}"
+				+ ".image-title {width: 100%;height: " + titleImageDivHeightInMM + "mm;text-align: center;}"
 				+ "</style>";
 		
 		head = "<head><title>Home</title>" + style + "</head>";
@@ -336,7 +352,7 @@ public class HomeController extends BaseController {
 		String titleDiv = "";
 		if(StringUtils.isNotBlank(title))
 		{
-			titleDiv  = "<div class='page-title' >" + title + "</div>";
+			titleDiv  = "<div class='page-title' ><b>" + title + "</b></div>";
 		}
 		
 		int rowCountInt = Integer.parseInt(rowCount);
@@ -352,8 +368,21 @@ public class HomeController extends BaseController {
 			String colImageString = "";
 			for (int j = 0; j < colCountInt; j++) {
 				if (imageCount > 0 && imageList[imageIndex] != null) {
+					
+					String imageClassName = "";
+					String imageTitleDiv = "";
+					if(imageTitleList[imageIndex] != null)
+					{
+						imageClassName = "imageWithTitle";
+						imageTitleDiv = "<div class='image-title' ><small>" + imageTitleList[imageIndex] + "</small></div>";
+					}
+					else
+						imageClassName = "image";
+					
+					
 					colImageString += "<div class='column' >" + "<div class='" + boostrapColClass + " imageContainer'>"
-							+ "<img class='image' src='data:image/jpg;base64," + imageList[imageIndex]
+							+ imageTitleDiv
+							+ "<img class='" + imageClassName + "' src='data:image/jpg;base64," + imageList[imageIndex]
 							+ "'></div></div>";
 				}
 

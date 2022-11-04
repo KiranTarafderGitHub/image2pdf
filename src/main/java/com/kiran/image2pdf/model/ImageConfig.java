@@ -10,6 +10,7 @@ public class ImageConfig {
 	private Template template;
 	private Size size;
 	private String[] imageList;
+	private String[] imageTitles;
 	
 	public Template getTemplate() {
 		return template;
@@ -29,11 +30,15 @@ public class ImageConfig {
 	public void setImageList(String[] imageList) {
 		this.imageList = imageList;
 	}
+	public String[] getImageTitles() {
+		return imageTitles;
+	}
+	public void setImageTitles(String[] imageTitles) {
+		this.imageTitles = imageTitles;
+	}
 	@Override
 	public String toString() {
 		return "ImageConfig [template=" + template + ", size=" + size + ", imageList=" + Arrays.toString(imageList)
-				+ "]";
+				+ ", imageTitles=" + Arrays.toString(imageTitles) + "]";
 	}
-	
-	
 }

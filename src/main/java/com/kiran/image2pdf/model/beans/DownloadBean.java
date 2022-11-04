@@ -11,6 +11,7 @@ public class DownloadBean {
 	String userImageCount;
 	MultipartFile[] uploadImgs;
 	String pageTitle;
+	String[] imageTitles;
 	
 	
 	public String getTemplateId() {
@@ -44,10 +45,16 @@ public class DownloadBean {
 		this.pageTitle = pageTitle;
 	}
 	
+	public String[] getImageTitles() {
+		return imageTitles;
+	}
+	public void setImageTitles(String[] imageTitles) {
+		this.imageTitles = imageTitles;
+	}
 	@Override
 	public String toString() {
 		return "DownloadBean [templateId=" + templateId + ", sizeId=" + sizeId + ", userImageCount=" + userImageCount
-				+ ", uploadImgs=" + Arrays.toString(uploadImgs) + ", pageTitle=" + pageTitle + "]";
+				+ ", uploadImgs=" + Arrays.toString(uploadImgs) + ", pageTitle=" + pageTitle + ", imageTitles="
+				+ Arrays.toString(imageTitles) + "]";
 	}
-
 }
