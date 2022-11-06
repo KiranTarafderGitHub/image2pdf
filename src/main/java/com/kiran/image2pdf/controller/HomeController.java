@@ -138,20 +138,28 @@ public class HomeController extends BaseController {
 			
 			
 			int selectedImageCount = downloadBean.getUploadImgs().length;
-
+			//System.out.println("selectedImageCount: " + selectedImageCount);
+			
 			int pageCount = 0;
 
 			pageCount = selectedImageCount / templateImageCount;
-
+			//System.out.println("templateImageCount: " + templateImageCount);
+			//System.out.println("pageCount: " + pageCount);
+			
+			
 			if (selectedImageCount % templateImageCount > 0)
 				pageCount++;
 
 			// For each page start
 			for (int i = 0; i < pageCount; i++) {
 				
+				//System.out.println("Inside page loop");
 				int currentPageImageStartIndex = i * (templateImageCount - 1) + i;
-				int currentPageImageEndIndex = i * (templateImageCount - 1) + (templateImageCount - 1);
+				int currentPageImageEndIndex = (i + 1) * templateImageCount - 1;
 
+				//System.out.println("currentPageImageStartIndex: " + currentPageImageStartIndex);
+				//System.out.println("currentPageImageEndIndex: " + currentPageImageEndIndex);
+				
 				String[] imageList = new String[templateImageCount];
 				String[] imageTitleList = new String[templateImageCount];
 				
@@ -288,6 +296,7 @@ public class HomeController extends BaseController {
 
 	public void createPdf(String dest, ImageConfig imageConfig,  String title) throws IOException {
 
+		System.out.println("inside createPdf");
 		String[] imageList = imageConfig.getImageList();
 		String[] imageTitleList = imageConfig.getImageTitles();
 		
@@ -335,6 +344,10 @@ public class HomeController extends BaseController {
 		String body = "";
 		String style = "";
 
+		if(StringUtils.isNotBlank(body))
+			System.out.println("Body is not black");
+		
+		
 		style = "<style>@page { size: " + pageTypeName + "; margin: 0;}@media print {  html, body {  width: "
 				+ pageWidthInMM + "mm;height: " + pageHeightInMM + "mm; }}" + ".container {width: " + containerWidthInMM
 				+ "mm;height: " + containerHeightInMM + "mm;padding: 3px 1px 1px 1px;}" + ".row {height:" + rowHeightInPercent
