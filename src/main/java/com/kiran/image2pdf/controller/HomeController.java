@@ -218,12 +218,21 @@ public class HomeController extends BaseController {
 			InputStreamResource resource = new InputStreamResource(new FileInputStream(fileToDownload));
 			LocalDateTime now = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-			String dateStr = formatter.format(now);
 			
+			String downloadName;
+			
+			if(StringUtils.isNoneBlank(downloadBean.getPageTitle()))
+			{
+				downloadName = downloadBean.getPageTitle();
+			}
+			else
+			{
+				downloadName = "myPDF-" +formatter.format(now);
+			}
 			
 			try {
 				
-				return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=myPDF-" + dateStr + ".pdf")
+				return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + downloadName + ".pdf")
 						.contentType(MediaType.APPLICATION_PDF).contentLength(fileToDownload.length()).body(resource);
 				
 			} catch (Exception e) {

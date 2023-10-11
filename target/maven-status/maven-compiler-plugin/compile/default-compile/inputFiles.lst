@@ -4,6 +4,7 @@
 /home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/utils/templates/pagesize/PageSize.java
 /home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/service/PdfService.java
 /home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/model/ImageConfig.java
+/home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/model/beans/DownloadBean.java
 /home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/controller/HomeController.java
 /home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/controller/BaseController.java
 /home/kiran/workspace/workspace_askinterior/image2pdf/src/main/java/com/kiran/image2pdf/utils/templates/config/TemplateConfig.java

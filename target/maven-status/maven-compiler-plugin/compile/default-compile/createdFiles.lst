@@ -4,6 +4,7 @@ com/kiran/image2pdf/utils/templates/pagesize/PageSize.class
 com/kiran/image2pdf/utils/templates/pagesize/PageSize$Sizes.class
 com/kiran/image2pdf/service/PdfService.class
 com/kiran/image2pdf/utils/templates/config/TemplateConfig.class
+com/kiran/image2pdf/model/beans/DownloadBean.class
 com/kiran/image2pdf/Image2pdfApplication.class
 com/kiran/image2pdf/utils/templates/config/TemplateConfig$Template.class
 com/kiran/image2pdf/model/ImageConfig.class
