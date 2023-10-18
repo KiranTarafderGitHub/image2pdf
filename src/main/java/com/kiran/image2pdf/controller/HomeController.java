@@ -1,5 +1,7 @@
 package com.kiran.image2pdf.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,15 +19,18 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,14 +96,14 @@ public class HomeController extends BaseController {
 		}
 	}
 
-	@RequestMapping(value = { "/", "/login" }, method = RequestMethod.GET)
+	@GetMapping(value = { "/", "/login" })
 	public ModelAndView login() {
 		ModelAndView modelAndView = new ModelAndView();
 		modelAndView.setViewName("pages/home");
 		return modelAndView;
 	}
 
-	@RequestMapping(value = { "/home" }, method = RequestMethod.GET)
+	@GetMapping(value = { "/home" })
 	public ModelAndView home() {
 
 		ModelAndView modelAndView = new ModelAndView();
@@ -107,7 +112,7 @@ public class HomeController extends BaseController {
 		return modelAndView;
 	}
 
-	@RequestMapping(value = { "/create" }, method = RequestMethod.GET)
+	@GetMapping(value = { "/create" })
 	public ModelAndView create() {
 
 		ModelAndView modelAndView = new ModelAndView();
@@ -121,13 +126,63 @@ public class HomeController extends BaseController {
 
 	@PostMapping("/download")
 	public ResponseEntity<InputStreamResource> download(@ModelAttribute DownloadBean downloadBean) {
-		
-		ModelAndView modelAndView = new ModelAndView();
+
 		try {
 
-			List<InputStream> inputPdfList = new ArrayList<>();
-			File mergedFile = File.createTempFile("merged", ".pdf");
-			OutputStream outputStream = new FileOutputStream(mergedFile);
+			List<String> htmlPageList = generateHtmlPages(downloadBean);
+
+			// Create a PDF document
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			PdfWriter writer = new PdfWriter(byteArrayOutputStream);
+			PdfDocument pdf = new PdfDocument(writer);
+			ConverterProperties properties = new ConverterProperties();
+
+			Document document = null;
+			String completeHtml = "";
+
+			if (CollectionUtils.isNotEmpty(htmlPageList)) {
+				for (String htmlPage : htmlPageList) {
+					completeHtml += htmlPage;
+				}
+			}
+
+			document = HtmlConverter.convertToDocument(completeHtml, pdf, properties);
+
+			// Close the PDF document
+			document.close();
+			pdf.close();
+
+			// Set up HTTP headers for the response
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_PDF);
+
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+			String downloadName;
+			if (StringUtils.isNoneBlank(downloadBean.getPageTitle())) {
+				downloadName = downloadBean.getPageTitle();
+			} else {
+				downloadName = "myPDF-" + formatter.format(LocalDateTime.now());
+			}
+
+			headers.setContentDispositionFormData("attachment", downloadName + ".pdf");
+
+			// Create an InputStreamResource from the generated PDF content
+			InputStreamResource resource = new InputStreamResource(
+					new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
+
+			// Return the PDF as a ResponseEntity
+			return ResponseEntity.ok().headers(headers).body(resource);
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
+
+	public List<String> generateHtmlPages(DownloadBean downloadBean) {
+		
+		List<String> htmlPageList = new ArrayList<>();
+		try {
 
 			int templateImageCount = 0;
 			for (Template tmpl : templateList) {
@@ -135,40 +190,39 @@ public class HomeController extends BaseController {
 					templateImageCount = Integer.valueOf(tmpl.getImageCount());
 				}
 			}
-			
-			
+
 			int selectedImageCount = downloadBean.getUploadImgs().length;
-			//System.out.println("selectedImageCount: " + selectedImageCount);
-			
+			// System.out.println("selectedImageCount: " + selectedImageCount);
+
 			int pageCount = 0;
 
-			pageCount = selectedImageCount / templateImageCount;
-			//System.out.println("templateImageCount: " + templateImageCount);
-			//System.out.println("pageCount: " + pageCount);
-			
-			
 			if (selectedImageCount % templateImageCount > 0)
-				pageCount++;
+				pageCount = (selectedImageCount / templateImageCount) + 1;
+			else
+				pageCount = selectedImageCount / templateImageCount;
+
+			System.out.println("templateImageCount: " + templateImageCount);
+			System.out.println("pageCount: " + pageCount);
 
 			// For each page start
 			for (int i = 0; i < pageCount; i++) {
-				
-				//System.out.println("Inside page loop");
+
+				System.out.println("Inside page loop");
 				int currentPageImageStartIndex = i * (templateImageCount - 1) + i;
 				int currentPageImageEndIndex = (i + 1) * templateImageCount - 1;
 
-				//System.out.println("currentPageImageStartIndex: " + currentPageImageStartIndex);
-				//System.out.println("currentPageImageEndIndex: " + currentPageImageEndIndex);
-				
+				System.out.println("currentPageImageStartIndex: " + currentPageImageStartIndex);
+				System.out.println("currentPageImageEndIndex: " + currentPageImageEndIndex);
+
 				String[] imageList = new String[templateImageCount];
 				String[] imageTitleList = new String[templateImageCount];
-				
+
 				int currentPageImageListIndex = 0;
 				for (int j = currentPageImageStartIndex; j <= currentPageImageEndIndex; j++) {
-					
-					if( j < downloadBean.getUploadImgs().length)
-					{
-						imageList[currentPageImageListIndex] = Base64.encodeBase64String(downloadBean.getUploadImgs()[j].getBytes());
+
+					if (j < downloadBean.getUploadImgs().length) {
+						imageList[currentPageImageListIndex] = Base64
+								.encodeBase64String(downloadBean.getUploadImgs()[j].getBytes());
 						imageTitleList[currentPageImageListIndex] = downloadBean.getImageTitles()[j];
 					}
 					currentPageImageListIndex++;
@@ -177,7 +231,7 @@ public class HomeController extends BaseController {
 				ImageConfig imageConfig = new ImageConfig();
 				imageConfig.setImageList(imageList);
 				imageConfig.setImageTitles(imageTitleList);
-				
+
 				for (Template tmpl : templateList) {
 					if (String.valueOf(tmpl.getId()).equals(downloadBean.getTemplateId())) {
 						imageConfig.setTemplate(tmpl);
@@ -191,128 +245,37 @@ public class HomeController extends BaseController {
 				}
 
 				try {
-					
-					File pdfFile = File.createTempFile(LocalDateTime.now().toString().replace(" ", ""), ".pdf");
-					createPdf(pdfFile.getName(), imageConfig, downloadBean.getPageTitle());
-					InputStream fileInputStream = new FileInputStream(pdfFile.getName());
-					inputPdfList.add(fileInputStream);
-					
-					pdfFile.delete();
-					
+
+					String singleHtmlPageStr = createPdfHtml(imageConfig, downloadBean.getPageTitle());
+					System.out.println("Successfully build single page");
+					htmlPageList.add(singleHtmlPageStr);
+
 				} catch (IOException e) {
-					e.printStackTrace();
-					modelAndView.addObject("message", "error");
+					System.out.println(e.getMessage());
 				} catch (Exception ee) {
-					ee.printStackTrace();
-					modelAndView.addObject("message", "error");
+					System.out.println(ee.getMessage());
 				}
 
 			}
-			// For each page end
-
-			mergePdfFiles(inputPdfList,outputStream);
-			// Below part will be create for each individual pages
-
-			File fileToDownload = mergedFile;
-
-			InputStreamResource resource = new InputStreamResource(new FileInputStream(fileToDownload));
-			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-			
-			String downloadName;
-			
-			if(StringUtils.isNoneBlank(downloadBean.getPageTitle()))
-			{
-				downloadName = downloadBean.getPageTitle();
-			}
-			else
-			{
-				downloadName = "myPDF-" +formatter.format(now);
-			}
-			
-			try {
-				
-				return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + downloadName + ".pdf")
-						.contentType(MediaType.APPLICATION_PDF).contentLength(fileToDownload.length()).body(resource);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			finally {
-				mergedFile.delete();
-			}
-			
 
 		} catch (Exception e) {
-
-			e.printStackTrace();
-			return null;
+			System.out.println(e.getMessage());
 		}
+
+		return htmlPageList;
 	}
 
-	public void mergePdfFiles(List<InputStream> inputPdfList, OutputStream outputStream) throws Exception {
+	public String createPdfHtml(ImageConfig imageConfig, String title) throws IOException {
 
-		// Create document and pdfReader objects.
-		com.itextpdf.text.Document document = new com.itextpdf.text.Document();
-		List<com.itextpdf.text.pdf.PdfReader> readers = new ArrayList<com.itextpdf.text.pdf.PdfReader>();
-		int totalPages = 0;
-
-		// Create pdf Iterator object using inputPdfList.
-		Iterator<InputStream> pdfIterator = inputPdfList.iterator();
-
-		// Create reader list for the input pdf files.
-		while (pdfIterator.hasNext()) {
-			InputStream pdf = pdfIterator.next();
-			com.itextpdf.text.pdf.PdfReader pdfReader = new com.itextpdf.text.pdf.PdfReader(pdf);
-			readers.add(pdfReader);
-			totalPages = totalPages + pdfReader.getNumberOfPages();
-		}
-
-		// Create writer for the outputStream
-		com.itextpdf.text.pdf.PdfWriter writer = com.itextpdf.text.pdf.PdfWriter.getInstance(document, outputStream);
-
-		// Open document.
-		document.open();
-
-		// Contain the pdf data.
-		PdfContentByte pageContentByte = writer.getDirectContent();
-
-		PdfImportedPage pdfImportedPage;
-		int currentPdfReaderPage = 1;
-		Iterator<com.itextpdf.text.pdf.PdfReader> iteratorPDFReader = readers.iterator();
-
-		// Iterate and process the reader list.
-		while (iteratorPDFReader.hasNext()) {
-			com.itextpdf.text.pdf.PdfReader pdfReader = iteratorPDFReader.next();
-			// Create page and add content.
-			while (currentPdfReaderPage <= pdfReader.getNumberOfPages()) {
-				document.newPage();
-				pdfImportedPage = writer.getImportedPage(pdfReader, currentPdfReaderPage);
-				pageContentByte.addTemplate(pdfImportedPage, 0, 0);
-				currentPdfReaderPage++;
-			}
-			currentPdfReaderPage = 1;
-		}
-
-		// Close document and outputStream.
-		outputStream.flush();
-		document.close();
-		outputStream.close();
-
-		System.out.println("Pdf files merged successfully.");
-	}
-
-	public void createPdf(String dest, ImageConfig imageConfig,  String title) throws IOException {
-
-		System.out.println("inside createPdf");
+		System.out.println("inside createPdfHtml for a single page");
 		String[] imageList = imageConfig.getImageList();
 		String[] imageTitleList = imageConfig.getImageTitles();
-		
+
 		int imageCount = imageList.length;
+		System.out.println("Total no of images for this page is " + imageCount);
 		String titleDivHeightInMM = "7";
 		String titleImageDivHeightInMM = "5";
-		
+
 		String rowCount = imageConfig.getTemplate().getRow();
 		String colCount = imageConfig.getTemplate().getCol();
 
@@ -323,14 +286,12 @@ public class HomeController extends BaseController {
 
 		String containerWidthInMM = String.valueOf((Integer.parseInt(pageWidthInMM) - 1));
 		String containerHeightInMM;
-		
-		if(StringUtils.isNotBlank(title))
-			containerHeightInMM = String.valueOf((Integer.parseInt(pageHeightInMM)  - Integer.parseInt(titleDivHeightInMM) - 1));
+
+		if (StringUtils.isNotBlank(title))
+			containerHeightInMM = String
+					.valueOf((Integer.parseInt(pageHeightInMM) - Integer.parseInt(titleDivHeightInMM) - 1));
 		else
 			containerHeightInMM = String.valueOf((Integer.parseInt(pageHeightInMM) - 2));
-		
-		
-		
 
 		String rowHeightInPercent = String.valueOf((100 / Integer.parseInt(rowCount)));
 		String rowWidthInPercent = "100";
@@ -341,42 +302,41 @@ public class HomeController extends BaseController {
 		float imageContainerHeightInMMFloat = (Float.parseFloat(rowHeightInPercent) * (95.0F / 100.0F))
 				* Float.parseFloat(containerHeightInMM) / 100.0F;
 		String imageContainerHeightInMM = String.valueOf((int) imageContainerHeightInMMFloat);
-		
+
 		float imageHeightInMMFloat = imageContainerHeightInMMFloat;
 		String imageHeightInMM = String.valueOf((int) imageHeightInMMFloat);
-		
+
 		float imageWithTitleHeightInMMFloat = imageContainerHeightInMMFloat - Float.parseFloat(titleImageDivHeightInMM);
 		String imageWithTitleHeightInMM = String.valueOf((int) imageWithTitleHeightInMMFloat);
-		
+
 		String html = "";
 		String head = "";
 		String body = "";
 		String style = "";
 
-		if(StringUtils.isNotBlank(body))
+		if (StringUtils.isNotBlank(body))
 			System.out.println("Body is not black");
-		
-		
+
 		style = "<style>@page { size: " + pageTypeName + "; margin: 0;}@media print {  html, body {  width: "
 				+ pageWidthInMM + "mm;height: " + pageHeightInMM + "mm; }}" + ".container {width: " + containerWidthInMM
-				+ "mm;height: " + containerHeightInMM + "mm;padding: 3px 1px 1px 1px;}" + ".row {height:" + rowHeightInPercent
-				+ "%;width:" + rowWidthInPercent + "%;padding:1px 3px 1px 3px;}" + ".column {float: left;width: "
-				+ colWidthInPercent + "%;padding: 5px;height: " + colheightInPercent + "%;}"
-				+ ".imageContainer {height:" + imageContainerHeightInMM + "mm;}"
-				+ ".image { width: 100%;height: " + imageHeightInMM + "mm;margin: auto;object-fit: contain;display:block;}"
-				+ ".imageWithTitle { width: 100%;height: " + imageWithTitleHeightInMM + "mm;margin: auto;object-fit: contain;display:block;}"
+				+ "mm;height: " + containerHeightInMM + "mm;padding: 3px 1px 1px 1px;}" + ".row {height:"
+				+ rowHeightInPercent + "%;width:" + rowWidthInPercent + "%;padding:1px 3px 1px 3px;}"
+				+ ".column {float: left;width: " + colWidthInPercent + "%;padding: 5px;height: " + colheightInPercent
+				+ "%;}" + ".imageContainer {height:" + imageContainerHeightInMM + "mm;}"
+				+ ".image { width: 100%;height: " + imageHeightInMM
+				+ "mm;margin: auto;object-fit: contain;display:block;}" + ".imageWithTitle { width: 100%;height: "
+				+ imageWithTitleHeightInMM + "mm;margin: auto;object-fit: contain;display:block;}"
 				+ ".page-title {height:" + titleDivHeightInMM + "mm;text-align: center;padding-top:3px;}"
 				+ ".image-title {width: 100%;height: " + titleImageDivHeightInMM + "mm;text-align: center;}"
 				+ "</style>";
-		
+
 		head = "<head><title>Home</title>" + style + "</head>";
-		
+
 		String titleDiv = "";
-		if(StringUtils.isNotBlank(title))
-		{
-			titleDiv  = "<div class='page-title' ><b>" + title + "</b></div>";
+		if (StringUtils.isNotBlank(title)) {
+			titleDiv = "<div class='page-title' ><b>" + title + "</b></div>";
 		}
-		
+
 		int rowCountInt = Integer.parseInt(rowCount);
 		int colCountInt = Integer.parseInt(colCount);
 
@@ -389,23 +349,21 @@ public class HomeController extends BaseController {
 		for (int i = 0; i < rowCountInt || i < imageList.length; i++) {
 			String colImageString = "";
 			for (int j = 0; j < colCountInt; j++) {
+
 				if (imageCount > 0 && imageList[imageIndex] != null) {
-					
+
 					String imageClassName = "";
 					String imageTitleDiv = "";
-					if(imageTitleList[imageIndex] != null)
-					{
+					if (imageTitleList[imageIndex] != null) {
 						imageClassName = "imageWithTitle";
-						imageTitleDiv = "<div class='image-title' ><small>" + imageTitleList[imageIndex] + "</small></div>";
-					}
-					else
+						imageTitleDiv = "<div class='image-title' ><small>" + imageTitleList[imageIndex]
+								+ "</small></div>";
+					} else
 						imageClassName = "image";
-					
-					
+
 					colImageString += "<div class='column' >" + "<div class='" + boostrapColClass + " imageContainer'>"
-							+ imageTitleDiv
-							+ "<img class='" + imageClassName + "' src='data:image/jpg;base64," + imageList[imageIndex]
-							+ "'></div></div>";
+							+ imageTitleDiv + "<img class='" + imageClassName + "' src='data:image/jpg;base64,"
+							+ imageList[imageIndex] + "'></div></div>";
 				}
 
 				imageCount--;
@@ -418,14 +376,7 @@ public class HomeController extends BaseController {
 
 		html = "<html>" + head + body + "</html>";
 
-		ConverterProperties properties = new ConverterProperties();
-		// properties.setBaseUri(baseUri);
-		PdfWriter writer = new PdfWriter(dest);
-		PdfDocument pdf = new PdfDocument(writer);
-
-		Document document = HtmlConverter.convertToDocument(html, pdf, properties);
-
-		document.close();
+		return html;
 	}
 
 }
