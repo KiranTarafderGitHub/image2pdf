@@ -273,8 +273,8 @@ public class HomeController extends BaseController {
 
 		int imageCount = imageList.length;
 		System.out.println("Total no of images for this page is " + imageCount);
-		String titleDivHeightInMM = "7";
-		String titleImageDivHeightInMM = "5";
+		String titleDivHeightInMM = "6";
+		String titleImageDivHeightInMM = "4";
 
 		String rowCount = imageConfig.getTemplate().getRow();
 		String colCount = imageConfig.getTemplate().getCol();
@@ -289,7 +289,7 @@ public class HomeController extends BaseController {
 
 		if (StringUtils.isNotBlank(title))
 			containerHeightInMM = String
-					.valueOf((Integer.parseInt(pageHeightInMM) - Integer.parseInt(titleDivHeightInMM) - 1));
+					.valueOf((Integer.parseInt(pageHeightInMM) - Integer.parseInt(titleDivHeightInMM) - 2));
 		else
 			containerHeightInMM = String.valueOf((Integer.parseInt(pageHeightInMM) - 2));
 
