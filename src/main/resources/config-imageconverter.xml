@@ -9,5 +9,6 @@
 		<template id="6" template-name="6 (3Row X 2Col) Image " image-count="6" row="3" col="2" orientation="v"/>
 		<template id="7" template-name="8 (2Row X 4Col) Image " image-count="8" row="2" col="4" orientation="v"/>
 		<template id="8" template-name="8 (4Row X 2Col) Image " image-count="8" row="4" col="2" orientation="v"/>
+		<template id="9" template-name="9 (3Row X 3Col) Image " image-count="9" row="3" col="3" orientation="v"/>
 	</templates>
 </template-config>
