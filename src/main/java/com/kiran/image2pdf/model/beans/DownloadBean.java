@@ -51,10 +51,18 @@ public class DownloadBean {
 	public void setImageTitles(String[] imageTitles) {
 		this.imageTitles = imageTitles;
 	}
+	/*
+	 * @Override public String toString() { return "DownloadBean [templateId=" +
+	 * templateId + ", sizeId=" + sizeId + ", userImageCount=" + userImageCount +
+	 * ", uploadImgs=" + Arrays.toString(uploadImgs) + ", pageTitle=" + pageTitle +
+	 * ", imageTitles=" + Arrays.toString(imageTitles) + "]"; }
+	 */
 	@Override
 	public String toString() {
 		return "DownloadBean [templateId=" + templateId + ", sizeId=" + sizeId + ", userImageCount=" + userImageCount
 				+ ", uploadImgs=" + Arrays.toString(uploadImgs) + ", pageTitle=" + pageTitle + ", imageTitles="
 				+ Arrays.toString(imageTitles) + "]";
 	}
+	
+	
 }

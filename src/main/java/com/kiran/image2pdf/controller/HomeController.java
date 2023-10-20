@@ -3,15 +3,10 @@ package com.kiran.image2pdf.controller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -22,6 +17,8 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
@@ -33,8 +30,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.itextpdf.html2pdf.ConverterProperties;
@@ -42,8 +37,6 @@ import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfImportedPage;
 import com.kiran.image2pdf.model.ImageConfig;
 import com.kiran.image2pdf.model.beans.DownloadBean;
 import com.kiran.image2pdf.service.PdfService;
@@ -57,6 +50,8 @@ import com.kiran.image2pdf.utils.templates.pagesize.PageSize.Sizes;
 @Controller
 public class HomeController extends BaseController {
 
+	private static final Logger log = LoggerFactory.getLogger(HomeController.class);
+	
 	@Autowired
 	PdfService pdfService;
 
@@ -90,9 +85,9 @@ public class HomeController extends BaseController {
 			sizeList = sizes.getSizeList();
 
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			log.error(e.getMessage(),e);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(),e);
 		}
 	}
 
@@ -129,7 +124,15 @@ public class HomeController extends BaseController {
 
 		try {
 
+			log.info("/download api called : " + downloadBean);
+			if(downloadBean.getImageTitles().length < 1)
+			{
+				String[] emptyArray = new String[] {""};
+				downloadBean.setImageTitles(emptyArray);
+			}
+			
 			List<String> htmlPageList = generateHtmlPages(downloadBean);
+			
 
 			// Create a PDF document
 			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -174,7 +177,7 @@ public class HomeController extends BaseController {
 			return ResponseEntity.ok().headers(headers).body(resource);
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			log.error(e.getMessage(),e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -221,8 +224,8 @@ public class HomeController extends BaseController {
 				for (int j = currentPageImageStartIndex; j <= currentPageImageEndIndex; j++) {
 
 					if (j < downloadBean.getUploadImgs().length) {
-						imageList[currentPageImageListIndex] = Base64
-								.encodeBase64String(downloadBean.getUploadImgs()[j].getBytes());
+						
+						imageList[currentPageImageListIndex] = Base64.encodeBase64String(downloadBean.getUploadImgs()[j].getBytes());
 						imageTitleList[currentPageImageListIndex] = downloadBean.getImageTitles()[j];
 					}
 					currentPageImageListIndex++;
@@ -251,15 +254,15 @@ public class HomeController extends BaseController {
 					htmlPageList.add(singleHtmlPageStr);
 
 				} catch (IOException e) {
-					System.out.println(e.getMessage());
+					log.error(e.getMessage(),e);
 				} catch (Exception ee) {
-					System.out.println(ee.getMessage());
+					log.error(ee.getMessage(),ee);
 				}
 
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			log.error(e.getMessage(),e);
 		}
 
 		return htmlPageList;
