@@ -98,6 +98,15 @@ public class HomeController extends BaseController {
 		return modelAndView;
 	}
 
+	@GetMapping(value = { "/google04bf8b8928e64803.html" })
+	public ModelAndView searchConsole() {
+
+		ModelAndView modelAndView = new ModelAndView();
+		modelAndView.setViewName("pages/google04bf8b8928e64803");
+
+		return modelAndView;
+	}
+	
 	@GetMapping(value = { "/home" })
 	public ModelAndView home() {
 
